@@ -1,0 +1,42 @@
+# language_translation_tool.py
+
+import streamlit as st
+from googletrans import Translator
+from gtts import gTTS
+import os
+
+st.title("🌐 Language Translation Tool")
+
+translator = Translator()
+
+# Supported languages
+languages = {
+    "English": "en",
+    "Tamil": "ta",
+    "Telugu": "te",
+    "Malayalam": "ml",
+    "Kannada": "kn",
+    "Hindi": "hi"
+}
+
+# User Input
+text_input = st.text_area("Enter text to translate:")
+
+src_lang = st.selectbox("Source Language", list(languages.keys()))
+target_lang = st.selectbox("Target Language", list(languages.keys()))
+
+if st.button("Translate"):
+    if text_input.strip() == "":
+        st.warning("Please enter some text to translate.")
+    else:
+        try:
+            translated = translator.translate(text_input, src=languages[src_lang], dest=languages[target_lang])
+            st.success("Translated Text:")
+            st.write(translated.text)
+
+            # Text-to-speech
+            tts = gTTS(translated.text, lang=languages[target_lang])
+            tts.save("translated.mp3")
+            st.audio("translated.mp3", format="audio/mp3")
+        except Exception as e:
+            st.error(f"Translation failed: {e}")
